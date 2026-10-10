@@ -10,6 +10,7 @@
 <link rel="icon" href="icon-192.png">
 <title>Şeker Canavarları</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Lilita+One&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--ink:#4a1f3a;--sub:#8a5a78;--card:#fff8fc;--edge:#f0cfe0;--green:#3fc46f;--green-d:#24894a;--red:#ff5d6c;--red-d:#b82d3d;--gold:#ffc93a;--gold-d:#c48a00;--pink:#ff6fa8;--pink-d:#c43d77}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -95,14 +96,45 @@ i.coin{display:inline-block;width:20px;height:20px;border-radius:50%;vertical-al
 .shopic.lg{width:76px;height:76px;margin:8px auto 2px}.shopic.lg svg{width:52px;height:52px}
 .tabs{display:flex;gap:8px;background:#fff;border-radius:18px;padding:5px;box-shadow:0 3px 0 var(--edge)}.tabs button{flex:1;height:40px;border-radius:14px;font:400 18px "Lilita One";background:transparent;color:var(--sub)}.tabs button.on{background:var(--pink);color:#fff}
 .buyb.wear{background:linear-gradient(180deg,#ff8dbd,#f0508f);box-shadow:0 4px 0 var(--pink-d)}
+.cld-dot{position:absolute;right:3px;top:3px;width:10px;height:10px;border-radius:50%;background:#b8b0b8;border:2px solid #fff;transition:background .3s}
+.cld-dot.synced{background:var(--green);box-shadow:0 0 6px rgba(63,196,111,.8)}
+.cld-dot.sync{background:var(--gold);animation:pulse .6s infinite}
+.cld-dot.error{background:var(--red)}
+.card.wide{max-width:390px;max-height:86vh;overflow-y:auto;padding:20px 18px}
+.cld-form{display:flex;flex-direction:column;gap:10px;width:100%}
+.cld-input{height:46px;border-radius:15px;border:2px solid var(--edge);padding:0 14px;font:700 16px "Baloo 2";background:#fff;color:var(--ink);outline:0;box-shadow:inset 0 2px 4px rgba(0,0,0,.04);transition:border-color .2s}
+.cld-input:focus{border-color:var(--pink)}
+.cld-input::placeholder{color:#bfa2b3;font-weight:600}
+.cloud-card{background:#fff;border-radius:18px;padding:12px 14px;box-shadow:0 3px 0 var(--edge);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.cloud-card b{display:block;font:400 17px "Lilita One";line-height:1.2}
+.cloud-card span{display:block;font:700 13px "Baloo 2";color:var(--sub)}
+.rank-list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;padding-right:2px}
+.rank-item{display:flex;align-items:center;gap:10px;background:#fff;border-radius:16px;padding:8px 12px;box-shadow:0 3px 0 var(--edge);font-family:"Baloo 2"}
+.rank-item.me{outline:3px solid var(--pink);background:#fff2f8}
+.rank-num{width:32px;font:400 20px "Lilita One";text-align:center;color:var(--sub)}
+.rank-num.top{font-size:22px}
+.rank-name{flex:1;text-align:left;font:700 16px "Baloo 2";overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.me-tag{font:800 10px "Baloo 2";background:var(--pink);color:#fff;border-radius:6px;padding:2px 6px;letter-spacing:.5px}
+.rank-stars{font:800 17px "Lilita One";color:var(--gold-d);display:flex;align-items:center;gap:3px;white-space:nowrap}
 </style></head><body>
 <canvas id="c"></canvas>
 
 <div id="home" class="scr on">
-  <div class="topbar"><div style="display:flex;gap:8px"><button class="coinpill"><i class="coin"></i><span class="coinN">0</span></button><div class="coinpill heart"><i class="hrt">❤</i><span class="lifeN">5</span></div></div><button class="ib" id="toSet" aria-label="Ayarlar"><svg viewBox="0 0 24 24" fill="none" stroke="#4a1f3a" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M5.2 18.8l2.1-2.1M16.7 7.3l2.1-2.1"/></svg></button></div>
+  <div class="topbar">
+    <div style="display:flex;gap:8px"><button class="coinpill"><i class="coin"></i><span class="coinN">0</span></button><div class="coinpill heart"><i class="hrt">❤</i><span class="lifeN">5</span></div></div>
+    <div style="display:flex;gap:8px">
+      <button class="ib" id="toLead" aria-label="Sıralama"><svg viewBox="0 0 24 24" fill="none" stroke="#4a1f3a" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"/><path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H7v4h10v-4h-2c-.55 0-1-.45-1-1v-2.34"/><path d="M6 3h12v7a6 6 0 0 1-12 0V3z"/></svg></button>
+      <button class="ib" id="toCloud" aria-label="Bulut Hesabı"><svg viewBox="0 0 24 24" fill="none" stroke="#4a1f3a" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"/></svg><span id="cloudDot" class="cld-dot"></span></button>
+      <button class="ib" id="toSet" aria-label="Ayarlar"><svg viewBox="0 0 24 24" fill="none" stroke="#4a1f3a" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M5.2 18.8l2.1-2.1M16.7 7.3l2.1-2.1"/></svg></button>
+    </div>
+  </div>
   <div class="logo"><b>Şeker<br>Canavarları</b><span>Karamelleri çöz, canavarları doyur!</span></div>
   <canvas id="homeArt" width="600" height="340"></canvas>
-  <div class="homebtns"><button class="big pink" id="play">Bölüm 1</button><div style="display:flex;gap:12px"><button class="pill" id="toLv">Bölümler</button><button class="pill" id="toShop">🛒 Market</button></div><button class="pill chestb" id="chestBtn">🎁 Sandık</button></div>
+  <div class="homebtns">
+    <button class="big pink" id="play">Bölüm 1</button>
+    <div style="display:flex;gap:12px"><button class="pill" id="toLv">Bölümler</button><button class="pill" id="toShop">🛒 Market</button></div>
+    <div style="display:flex;gap:12px"><button class="pill" id="toLeadBtn">🏆 Sıralama</button><button class="pill chestb" id="chestBtn">🎁 Sandık</button></div>
+  </div>
 </div>
 
 <div id="levels" class="scr">
@@ -114,6 +146,13 @@ i.coin{display:inline-block;width:20px;height:20px;border-radius:50%;vertical-al
 <div id="settings" class="scr">
   <div class="topbar"><button class="ib" data-back aria-label="Geri"><svg viewBox="0 0 24 24" fill="none" stroke="#4a1f3a" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>Ayarlar</h2><div style="width:46px"></div></div>
   <div class="set">
+    <div class="cloud-card" id="setCloudCard">
+      <div>
+        <b id="cldUserTxt">Misafir Oyuncu</b>
+        <span id="cldStatusTxt">Buluta bağlı değil</span>
+      </div>
+      <button class="pill" id="setCloudBtn" style="height:38px;padding:0 14px;font-size:15px">Giriş Yap</button>
+    </div>
     <label>Ses <input type="checkbox" id="optSnd"></label>
     <label>Titreşim <input type="checkbox" id="optVib"></label>
     <label>Tüm bölümler açık (test) <input type="checkbox" id="optAll"></label>
@@ -300,7 +339,7 @@ let K=3,HASLOCK=false,NCUP=3,LVN=1;
 // ---------- kayıt ----------
 const SAVE_KEY='sekerCanavarlari_v1';let SV={un:1,st:{},snd:true,vib:true,all:false,coins:200,inv:{undo:1,hammer:0,skip:0,taps:0,mag:0,scis:0,scoop:0,snack:0,slot:0,joker:0},seen:{},used:{},cos:{hat:null,acc:null},own:{},lives:5,lifeT:0,inf:false,daily:{last:'',streak:0},chests:0};
 try{const t=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(t)SV={...SV,...t,inv:{...SV.inv,...(t.inv||{})}};}catch(e){}
-function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(SV));}catch(e){}}
+function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(SV));}catch(e){}if(typeof cloudSaveDebounced==='function')cloudSaveDebounced();}
 let LB=null;function setLevel(n){LVN=n;LB=LEVELS[n-1];L=LB;NW=Math.max(...L.x)+1;NR=Math.max(...L.r)+1;K=L.K;HASLOCK=!!L.lock;NCUP=K+(HASLOCK?1:0);layout();}
 
 // ---------- yerleşim ----------
@@ -588,14 +627,277 @@ function grid(){const g=$('grid');g.innerHTML='';for(let n=1;n<=LEVELS.length;n+
 function homeArt(){const c=$('homeArt');const x2=c.getContext('2d');const old=ctx,oW=W,oLY=LY;ctx=x2;x2.setTransform(2,0,0,2,0,0);x2.clearRect(0,0,300,170);LY={...LY,UH:34,catR:24};
   [['r',40,40],['y',110,25],['b',190,30],['g',260,45],['p',150,70]].forEach(([c,x,y])=>candy(x,y,c,0));caramel(40,57,110,8+34);caramel(190,47,150,53);caramel(260,62,190,47);
   [['r',45],['y',105],['b',165],['g',225],['p',285]].forEach(([c,x],k)=>monster(x-15,140,20,c,{arms:k%2===0,open:k===2}));ctx=old;LY=oLY;}
+// ---------- Supabase Bulut & Liderlik Entegrasyonu ----------
+const SB_URL='https://pvlexyvvfihbmjhobzqj.supabase.co';
+const SB_KEY='sb_publishable_WCi7zkpLKrdBGakKjcVLbw_WLpFbFEH';
+let sb=null,sbUser=null,sbProfile=null,syncTimer=null;
+
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);}
+
+function setCloudDot(status){
+  const d=$('cloudDot');if(!d)return;
+  d.className='cld-dot '+(status||'');
+}
+
+function updateCloudUI(){
+  const u=$('cldUserTxt'),st=$('cldStatusTxt'),b=$('setCloudBtn');
+  if(sbUser){
+    const nick=(sbProfile&&sbProfile.nickname)||(sbUser.user_metadata&&sbUser.user_metadata.nickname)||'Şekersever';
+    setCloudDot('synced');
+    if(u)u.textContent=nick;
+    if(st)st.textContent='☁️ Buluta bağlı ('+totalStars()+' ★)';
+    if(b)b.textContent='Profilim';
+  }else{
+    setCloudDot('');
+    if(u)u.textContent='Misafir Oyuncu';
+    if(st)st.textContent='Buluta bağlı değil';
+    if(b)b.textContent='Giriş Yap';
+  }
+}
+
+function cloudSaveDebounced(){
+  if(!sb||!sbUser)return;
+  clearTimeout(syncTimer);
+  setCloudDot('sync');
+  syncTimer=setTimeout(async()=>{
+    try{
+      const now=new Date().toISOString();
+      const stars=totalStars();
+      await sb.from('saves').upsert({
+        user_id:sbUser.id,
+        data:SV,
+        updated_at:now
+      });
+      const nick=(sbProfile&&sbProfile.nickname)||(sbUser.user_metadata&&sbUser.user_metadata.nickname)||'Şekersever';
+      await sb.from('profiles').upsert({
+        user_id:sbUser.id,
+        nickname:nick,
+        stars:stars,
+        updated_at:now
+      });
+      setCloudDot('synced');
+    }catch(e){
+      console.error('Bulut kayıt hatası:',e);
+      setCloudDot('error');
+    }
+  },1200);
+}
+
+function applyCloudData(data){
+  if(!data)return;
+  SV={...SV,...data,inv:{...SV.inv,...(data.inv||{})}};
+  try{localStorage.setItem(SAVE_KEY,JSON.stringify(SV));}catch(e){}
+  if(G)updHud();
+  refreshCoins();
+  refreshLives();
+  if($('levels').classList.contains('on'))grid();
+  if($('home').classList.contains('on')){
+    $('play').textContent=SV.un>LEVELS.length?'Bölümler':'Bölüm '+Math.min(SV.un,LEVELS.length);
+  }
+}
+
+async function checkCloudSave(forceLoad=false){
+  if(!sb||!sbUser)return;
+  try{
+    const {data:row,error}=await sb.from('saves').select('data, updated_at').eq('user_id',sbUser.id).maybeSingle();
+    if(error){console.warn('saves tablosu okuma uyarısı:',error);return;}
+    if(row&&row.data){
+      const cloudData=row.data;
+      const cloudStars=Object.values(cloudData.st||{}).reduce((a,b)=>a+b,0);
+      const localStars=totalStars();
+      if(forceLoad){
+        applyCloudData(cloudData);
+        toast('Bulut kaydı yüklendi!');
+        return;
+      }
+      if(cloudStars>localStars||(cloudData.un||1)>SV.un){
+        pop('<h3>Bulut Kaydı Bulundu</h3><p>Buluttaki ilerlemen: <b>Bölüm '+(cloudData.un||1)+'</b> ('+cloudStars+' ★)<br>Cihazdaki ilerlemen: <b>Bölüm '+SV.un+'</b> ('+localStars+' ★)<br><br>Buluttaki ilerlemen yüklensin mi?</p><div class="btns"><button class="big" id="pLoadCloud">Buluttan Yükle</button><button class="pill" id="pKeepLocal">Cihazdakini Koru</button></div>');
+        if($('pLoadCloud'))$('pLoadCloud').onclick=()=>{applyCloudData(cloudData);closePop();toast('Bulut kaydı yüklendi!');};
+        if($('pKeepLocal'))$('pKeepLocal').onclick=()=>{closePop();cloudSaveDebounced();toast('Cihazdaki ilerleme buluta eşitlendi.');};
+      }else{
+        cloudSaveDebounced();
+      }
+    }else{
+      cloudSaveDebounced();
+    }
+  }catch(e){
+    console.error('Bulut save kontrolü hatası:',e);
+  }
+}
+
+async function handleUserSession(user){
+  sbUser=user;
+  try{
+    const {data:prof}=await sb.from('profiles').select('nickname, stars').eq('user_id',user.id).maybeSingle();
+    if(prof){
+      sbProfile=prof;
+    }else{
+      const nick=(user.user_metadata&&user.user_metadata.nickname)||user.email.split('@')[0]||'Şekersever';
+      sbProfile={nickname:nick,stars:totalStars()};
+      await sb.from('profiles').upsert({
+        user_id:user.id,
+        nickname:nick,
+        stars:totalStars(),
+        updated_at:new Date().toISOString()
+      });
+    }
+    updateCloudUI();
+    await checkCloudSave();
+  }catch(e){
+    console.error('Kullanıcı profil hatası:',e);
+  }
+  updateCloudUI();
+}
+
+async function initSupabase(){
+  if(!window.supabase||!window.supabase.createClient)return;
+  try{
+    sb=window.supabase.createClient(SB_URL,SB_KEY,{
+      auth:{persistSession:true,autoRefreshToken:true}
+    });
+    const {data:{session}}=await sb.auth.getSession();
+    if(session&&session.user){
+      await handleUserSession(session.user);
+    }else{
+      updateCloudUI();
+    }
+    sb.auth.onAuthStateChange(async(evt,session)=>{
+      if(session&&session.user){
+        await handleUserSession(session.user);
+      }else{
+        sbUser=null;sbProfile=null;
+        updateCloudUI();
+      }
+    });
+  }catch(e){
+    console.error('Supabase başlatma hatası:',e);
+  }
+}
+
+function openAccountModal(){
+  if(sbUser){
+    const nick=(sbProfile&&sbProfile.nickname)||(sbUser.user_metadata&&sbUser.user_metadata.nickname)||'Şekersever';
+    pop('<div class="card wide"><h3>Oyuncu Profili</h3><p style="margin:4px 0 12px">Bulut hesabın aktif. İlerlemen eşitleniyor.</p><div style="background:#fff;border-radius:18px;padding:12px;box-shadow:0 3px 0 var(--edge);margin-bottom:12px;text-align:left"><div style="font-size:13px;color:var(--sub);font-weight:700">Oyuncu Adı</div><div style="display:flex;gap:6px;margin-top:4px"><input type="text" id="accNick" class="cld-input" value="'+escapeHtml(nick)+'" maxlength="16" style="flex:1"><button class="pill" id="accSaveNick" style="height:46px;padding:0 14px">Kaydet</button></div><div style="margin-top:10px;font-size:14px;color:var(--sub)"><b>E-posta:</b> '+escapeHtml(sbUser.email)+'</div><div style="margin-top:4px;font-size:14px;color:var(--sub)"><b>İlerleme:</b> Bölüm '+SV.un+' · '+totalStars()+' ★</div></div><div class="btns"><button class="pill" id="accSyncNow">☁️ Şimdi Buluta Kaydet</button><button class="pill" id="accLoadNow">⬇️ Buluttan Yükle</button><button class="pill" id="accSignOut" style="color:var(--red-d)">🚪 Çıkış Yap</button><button class="pill" id="accClose">Kapat</button></div></div>');
+    $('accSaveNick').onclick=async()=>{
+      const newNick=$('accNick').value.trim();
+      if(!newNick){toast('Lütfen geçerli bir isim girin');return;}
+      try{
+        await sb.from('profiles').upsert({
+          user_id:sbUser.id,
+          nickname:newNick,
+          stars:totalStars(),
+          updated_at:new Date().toISOString()
+        });
+        if(sbProfile)sbProfile.nickname=newNick;
+        updateCloudUI();
+        toast('İsim güncellendi!');
+      }catch(e){toast('İsim güncellenemedi');}
+    };
+    $('accSyncNow').onclick=()=>{cloudSaveDebounced();toast('Buluta kaydediliyor...');closePop();};
+    $('accLoadNow').onclick=async()=>{await checkCloudSave(true);closePop();};
+    $('accSignOut').onclick=async()=>{await sb.auth.signOut();closePop();toast('Çıkış yapıldı');};
+    $('accClose').onclick=closePop;
+  }else{
+    pop('<div class="card wide"><div class="tabs" style="margin-bottom:14px"><button class="on" id="tabLogin">Giriş Yap</button><button id="tabRegister">Kayıt Ol</button></div><div id="loginForm" class="cld-form"><input type="email" id="authEmail" class="cld-input" placeholder="E-posta adresi"><input type="password" id="authPass" class="cld-input" placeholder="Şifre"><button class="big" id="btnSubmitLogin" style="margin-top:6px">Giriş Yap</button></div><div id="registerForm" class="cld-form" style="display:none"><input type="text" id="regNick" class="cld-input" placeholder="Oyuncu Adı (Nickname)" maxlength="16"><input type="email" id="regEmail" class="cld-input" placeholder="E-posta adresi"><input type="password" id="regPass" class="cld-input" placeholder="Şifre (en az 6 karakter)"><button class="big pink" id="btnSubmitRegister" style="margin-top:6px">Kayıt Ol</button></div><div id="authMsg" style="margin-top:8px;font-size:13px;font-weight:700;color:var(--sub);min-height:18px"></div><button class="pill" id="accClose" style="margin-top:8px">Vazgeç</button></div>');
+    let isLoginTab=true;
+    $('tabLogin').onclick=()=>{
+      isLoginTab=true;
+      $('tabLogin').classList.add('on');$('tabRegister').classList.remove('on');
+      $('loginForm').style.display='flex';$('registerForm').style.display='none';
+      $('authMsg').textContent='';
+    };
+    $('tabRegister').onclick=()=>{
+      isLoginTab=false;
+      $('tabRegister').classList.add('on');$('tabLogin').classList.remove('on');
+      $('registerForm').style.display='flex';$('loginForm').style.display='none';
+      $('authMsg').textContent='';
+    };
+    $('btnSubmitLogin').onclick=async()=>{
+      const email=$('authEmail').value.trim(),password=$('authPass').value;
+      if(!email||!password){$('authMsg').textContent='Lütfen e-posta ve şifrenizi girin.';return;}
+      $('btnSubmitLogin').disabled=true;$('btnSubmitLogin').textContent='Giriş yapılıyor...';
+      try{
+        const {data,error}=await sb.auth.signInWithPassword({email,password});
+        if(error)throw error;
+        toast('Giriş başarılı!');
+        closePop();
+      }catch(e){
+        let msg=e.message||'Giriş yapılamadı.';
+        if(msg.includes('Email not confirmed'))msg='E-posta onaylanmamış! (Supabase panelinden email confirm kapatılabilir)';
+        if(msg.includes('Invalid login credentials'))msg='Hatalı e-posta veya şifre!';
+        $('authMsg').textContent=msg;
+        $('btnSubmitLogin').disabled=false;$('btnSubmitLogin').textContent='Giriş Yap';
+      }
+    };
+    $('btnSubmitRegister').onclick=async()=>{
+      const nick=$('regNick').value.trim()||'Şekersever';
+      const email=$('regEmail').value.trim(),password=$('regPass').value;
+      if(!email||!password){$('authMsg').textContent='Lütfen e-posta ve şifre girin.';return;}
+      if(password.length<6){$('authMsg').textContent='Şifre en az 6 karakter olmalı.';return;}
+      $('btnSubmitRegister').disabled=true;$('btnSubmitRegister').textContent='Kaydediliyor...';
+      try{
+        const {data,error}=await sb.auth.signUp({
+          email,password,
+          options:{data:{nickname:nick}}
+        });
+        if(error)throw error;
+        if(data.session){
+          toast('Hoş geldin, '+nick+'!');
+          closePop();
+        }else{
+          $('authMsg').textContent='Kayıt oluşturuldu! E-postanızı onaylayın veya panele girip onay ayarını kapatın.';
+          toast('Kayıt başarılı!');
+        }
+      }catch(e){
+        $('authMsg').textContent=e.message||'Kayıt oluşturulamadı.';
+        $('btnSubmitRegister').disabled=false;$('btnSubmitRegister').textContent='Kayıt Ol';
+      }
+    };
+    $('accClose').onclick=closePop;
+  }
+}
+
+async function openLeaderboardModal(){
+  pop('<div class="card wide"><div style="font-size:42px;line-height:1">🏆</div><h3 style="margin:2px 0 4px">Liderlik Tablosu</h3><p style="margin:0 0 12px;font-size:14px">En çok yıldız toplayan şeker canavarları!</p><div id="leadContent" style="min-height:150px;display:flex;align-items:center;justify-content:center"><span style="font-weight:800;color:var(--sub)">Yükleniyor...</span></div><div class="btns" style="margin-top:14px">'+(!sbUser?'<button class="big pink" id="leadLoginBtn" style="margin-bottom:4px">Sıralamaya Katıl (Giriş Yap)</button>':'')+'<button class="pill" id="leadClose">Kapat</button></div></div>');
+  if($('leadLoginBtn'))$('leadLoginBtn').onclick=()=>{closePop();openAccountModal();};
+  $('leadClose').onclick=closePop;
+  if(!sb){
+    $('leadContent').innerHTML='<span style="color:var(--red-d)">Supabase bağlantısı kurulamadı.</span>';
+    return;
+  }
+  try{
+    const {data:rows,error}=await sb.from('profiles').select('user_id, nickname, stars').order('stars',{ascending:false}).limit(25);
+    if(error)throw error;
+    if(!rows||rows.length===0){
+      $('leadContent').innerHTML='<div style="color:var(--sub);font-weight:700;padding:24px 0">Henüz kimse sıralamada yok.<br>İlk giren sen ol! 🌟</div>';
+      return;
+    }
+    const items=rows.map((r,i)=>{
+      const isMe=sbUser&&r.user_id===sbUser.id;
+      const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+      return '<div class="rank-item'+(isMe?' me':'')+'"><div class="rank-num '+(i<3?'top':'')+'">'+medal+'</div><div class="rank-name">'+escapeHtml(r.nickname||'Şekersever')+(isMe?' <span class="me-tag">SEN</span>':'')+'</div><div class="rank-stars">'+(r.stars||0)+' <span style="color:var(--gold)">★</span></div></div>';
+    }).join('');
+    $('leadContent').innerHTML='<div class="rank-list">'+items+'</div>';
+  }catch(e){
+    console.error('Liderlik hatası:',e);
+    $('leadContent').innerHTML='<span style="color:var(--red-d)">Sıralama alınamadı.</span>';
+  }
+}
+
 $('play').onclick=()=>{ac();if(SV.un>LEVELS.length)show('levels');else goLevel(SV.un);};$('toLv').onclick=()=>{ac();show('levels');};$('toSet').onclick=()=>{$('optSnd').checked=SV.snd;$('optVib').checked=SV.vib;$('optAll').checked=SV.all;$('optInf').checked=SV.inf;show('settings');};
 document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>show('home'));$('toShop').onclick=()=>{ac();show('shop');};document.querySelectorAll('.coinpill').forEach(b=>b.onclick=()=>{ac();show('shop');});
+$('toLead').onclick=()=>{ac();openLeaderboardModal();};
+if($('toLeadBtn'))$('toLeadBtn').onclick=()=>{ac();openLeaderboardModal();};
+$('toCloud').onclick=()=>{ac();openAccountModal();};
+$('setCloudBtn').onclick=()=>{ac();openAccountModal();};
 $('optSnd').onchange=e=>{SV.snd=e.target.checked;save();};$('optVib').onchange=e=>{SV.vib=e.target.checked;save();};$('optAll').onchange=e=>{SV.all=e.target.checked;save();};
 $('reset').onclick=()=>{SV.un=1;SV.st={};SV.coins=200;SV.inv={undo:1,hammer:0,skip:0,taps:0,mag:0,scis:0,scoop:0,snack:0,slot:0,joker:0};SV.seen={};SV.used={};SV.lives=5;SV.chests=0;save();toast('İlerleme sıfırlandı');};$('optInf').onchange=e=>{SV.inf=e.target.checked;save();refreshLives();};$('chestBtn').onclick=()=>{ac();openChest();};
 let last=performance.now();function loop(now){const dt=Math.min(.05,(now-last)/1000)*(window.__SPEED||1);last=now;update(dt);draw();requestAnimationFrame(loop);}
 addEventListener('resize',()=>{layout();});
 setLevel(Math.min(SV.un,LEVELS.length));show('home');requestAnimationFrame(loop);
 window.__K={L:()=>L,sxy:s=>[slotX(s),slotY(s)],lives:()=>livesNow(),G:()=>G,tap:i=>doTap(i),idle:()=>idle(),close:closePop,go:n=>goLevel(n),show};
+if(window.supabase&&window.supabase.createClient){initSupabase();}else{window.addEventListener('load',initSupabase);}
+
 })();
 
 </script>
